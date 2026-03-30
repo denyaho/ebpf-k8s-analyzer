@@ -62,20 +62,16 @@ func main() {
 	}
 	defer probe.Close()
 
-<<<<<<< HEAD
 	rd, err := ringbuf.NewReader(coll.Maps["events"])
 	if err != nil {
 		log.Fatal("Failed to open ringbuf reader:", err)
 	}
 	defer rd.Close()
 
-=======
->>>>>>> ac2487919706e208c473eb4c75b09d7ef2922d09
 	fmt.Println("Tracing tcp_connect... Press Ctrl+C to stop.")
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
-<<<<<<< HEAD
 	go func() {
 		<- sig
 		rd.Close() // シグナルを受け取ったらリングバッファリーダーを閉じて、ループを終了させる
@@ -99,8 +95,4 @@ func main() {
 			event.DstPort,
 		)
 	}
-=======
-	<-sig
->>>>>>> ac2487919706e208c473eb4c75b09d7ef2922d09
-	fmt.Println("eBPF analyzer stopped.")
 }

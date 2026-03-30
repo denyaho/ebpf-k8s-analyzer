@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 #define __TARGET_ARCH_x86
 #include "vmlinux.h"
 #include "bpf_helpers.h"
 #include "bpf_tracing.h"
-=======
-#include <vmlinux.h>
-#include <bpf/bpf_helpers.h>
-#include <bpf/bpf_tracing.h>
->>>>>>> ac2487919706e208c473eb4c75b09d7ef2922d09
 
 struct event {
     __u32 src_ip;
@@ -25,7 +19,6 @@ struct {
 SEC("kprobe/tcp_connect")
 int BPF_KPROBE(trace_connect, struct sock *sk)
 {
-<<<<<<< HEAD
     struct event *e;
 
     e = bpf_ringbuf_reserve(&events, sizeof(*e), 0);
@@ -41,15 +34,3 @@ int BPF_KPROBE(trace_connect, struct sock *sk)
 }
 
 char LICENSE[] SEC("license") = "GPL";
-=======
-    struct event event = {};
-    BPF_FUNC_probe_read_kernel(&event.src_ip, sizeof(event.src_ip), &sk->__sk_common.skc_rcv_addr);
-    BPF_FUNC_probe_read_kernel(&event.dst_ip, sizeof(event.dst_ip), &sk->__sk_common.skc_daddr);
-    BPF_FUNC_probe_read_kernel(&event.dst_port, sizeof(event.dst_port), &sk->__sk_common.skc_dport);
-    
-    bpf_ringbuf_output(&events, &event, sizeof(event), 0);
-    return 0;
-}
-
-char LICENSE[] SEC("license") = "GPL";
->>>>>>> ac2487919706e208c473eb4c75b09d7ef2922d09
