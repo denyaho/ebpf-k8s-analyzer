@@ -1,24 +1,17 @@
 package main
 
 import (
-<<<<<<< HEAD
 	"encoding/binary"
-=======
->>>>>>> ac2487919706e208c473eb4c75b09d7ef2922d09
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
-<<<<<<< HEAD
 	"net"
-=======
->>>>>>> ac2487919706e208c473eb4c75b09d7ef2922d09
 
 	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/link"
 	"github.com/cilium/ebpf/rlimit"
-<<<<<<< HEAD
 	"github.com/cilium/ebpf/ringbuf"
 
 )
@@ -29,20 +22,12 @@ type Event struct {
 	DstPort uint16
 }
 
-=======
-)
-
->>>>>>> ac2487919706e208c473eb4c75b09d7ef2922d09
 func main() {
 	if err := rlimit.RemoveMemlock(); err != nil {
 		log.Fatalf("Failed to remove memlock: %v", err)
 	}
-<<<<<<< HEAD
 	spec, err := ebpf.LoadCollectionSpec("bpf/trace.o")//ELFファイルをロードして、eBPFプログラムとマップの仕様を取得します
-=======
 
-	spec, err := ebpf.LoadCollectionSpec("bpf/trace.o")
->>>>>>> ac2487919706e208c473eb4c75b09d7ef2922d09
 	if err != nil {
 		log.Fatalf("Failed to load spec: %v", err)
 	}
@@ -88,7 +73,7 @@ func main() {
 		var event Event
 		event.SrcIP = binary.LittleEndian.Uint32(record.RawSample[0:4])
 		event.DstIP = binary.LittleEndian.Uint32(record.RawSample[4:8])
-		event.DstPort = binary.LittleEndian.Uint16(record.RawSample[8:10])
+		event.DstPort = binary.BigEndian.Uint16(record.RawSample[8:10])
 		fmt.Printf("%-20s -> %-20s port %d\n",
 			net.IP(record.RawSample[0:4]).String(),
 			net.IP(record.RawSample[4:8]).String(),
