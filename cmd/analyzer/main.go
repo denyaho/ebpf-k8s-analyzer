@@ -8,12 +8,15 @@ import (
 	"os"
 	"os/signal"
 	"net"
+	"net/http"
 
 	"github.com/cilium/ebpf"
 	"github.com/cilium/ebpf/link"
 	"github.com/cilium/ebpf/rlimit"
 	"github.com/cilium/ebpf/ringbuf"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Event struct {
@@ -22,7 +25,33 @@ type Event struct {
 	DstPort uint16
 }
 
+var (
+	tcpConnectCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "tcp_connect_total",
+			Help: "Total number of tcp_connect events",
+		},
+		[]string{"dst_ip", "dst_port"},
+
+	)
+)
+
+func init() {
+	prometheus.MustRegister(tcpConnectCounter)
+}
+
+
 func main() {
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		log.Println("Metrics server listening on :2112")
+		if err := http.ListenAndServe(":2112", nil); err != nil {
+			log.Fatalf("Failed to start metrics server: %v", err)
+		}
+	}()
+
+
 	if err := rlimit.RemoveMemlock(); err != nil {
 		log.Fatalf("Failed to remove memlock: %v", err)
 	}
@@ -79,5 +108,9 @@ func main() {
 			net.IP(record.RawSample[4:8]).String(),
 			event.DstPort,
 		)
+		tcpConnectCounter.WithLabelValues(
+			net.IP(record.RawSample[4:8]).String(),
+			fmt.Sprintf("%d", event.DstPort),
+		).Inc()
 	}
 }
