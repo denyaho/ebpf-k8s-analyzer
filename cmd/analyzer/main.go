@@ -32,7 +32,6 @@ var (
 			Help: "Total number of tcp_connect events",
 		},
 		[]string{"dst_ip", "dst_port"},
-
 	)
 )
 
@@ -44,6 +43,7 @@ func init() {
 func main() {
 
 	go func() {
+		//metricsエンドポイントを提供するHTTPサーバーを起動します
 		http.Handle("/metrics", promhttp.Handler())
 		log.Println("Metrics server listening on :2112")
 		if err := http.ListenAndServe(":2112", nil); err != nil {
