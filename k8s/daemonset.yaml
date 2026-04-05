@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ebpf-k8s-analyzer
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: ebpf-analyzer
+  template:
+    metadata:
+      labels:
+        app: ebpf-analyzer
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - name: ebpf-analyzer
+        image: ebpf-analyzer:latest
+        imagePullPolicy: Never
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: sys
+          mountPath: /sys
+        - name: debugfs
+          mountPath: /sys/kernel/debug
+      volumes:
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: debugfs
+        hostPath:
+          path: /sys/kernel/debug
