@@ -16,8 +16,8 @@ spec:
       hostPID: true
       containers:
       - name: ebpf-analyzer
-        image: gcr.io/ebpf-analyzer/ebpf-analyzer:latest
-        imagePullPolicy: Always
+        image: ebpf-analyzer:latest
+        imagePullPolicy: Never
         securityContext:
           privileged: true
         volumeMounts:
