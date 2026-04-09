@@ -1,2 +1,7 @@
 minikube-darwin-amd64
 minikube-linux-amd64
+google-cloud-sdk/
+google-cloud-cli-linux-x86_64.tar.gz
+terraform/.terraform/
+terraform/secret.json
+*.tar.gz
