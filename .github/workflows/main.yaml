@@ -12,5 +12,5 @@ jobs:
             - uses: actions/setup-go@v5
               with:
                 go-version: '1.24'
-            - nane: Go Build
+            - name: Go Build
               run: go build cmd/analyzer/
