@@ -3,6 +3,7 @@
 #include "bpf_helpers.h"
 #include "bpf_tracing.h"
 
+#define AF_INET 2
 struct event {
     __u32 src_ip;
     __u32 dst_ip;
@@ -23,6 +24,13 @@ int BPF_KPROBE(trace_connect, struct sock *sk)
 
     e = bpf_ringbuf_reserve(&events, sizeof(*e), 0);
     if (!e) {
+        return 0;
+    }
+
+    __u16 family;
+
+    bpf_probe_read_kernel(&family, sizeof(family), &sk->__sk_common.skc_family);
+    if (family != AF_INET) {
         return 0;
     }
     bpf_probe_read_kernel(&e->src_ip, sizeof(e->src_ip), &sk->__sk_common.skc_rcv_saddr);

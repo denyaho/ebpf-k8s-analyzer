@@ -60,7 +60,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load spec: %v", err)
 	}
-	coll, err := ebpf.NewCollection(spec)
+	coll, err := ebpf.NewCollection(spec) //仕様に基づいてeBPFプログラムとマップを作成します、カーネルにロードされる
 	if err != nil {
 		var ve *ebpf.VerifierError
 		if errors.As(err, &ve) {
@@ -70,13 +70,13 @@ func main() {
 	}
 	defer coll.Close()
 
-	probe, err := link.Kprobe("tcp_connect", coll.Programs["trace_connect"], nil)
+	probe, err := link.Kprobe("tcp_connect", coll.Programs["trace_connect"], nil) //link -> eBPFを特定のカーネル関数にアタッチします、ここではtcp_connect関数にtrace_connectプログラムをアタッチしています
 	if err != nil {
 		log.Fatalf("Failed to attach kprobe: %v", err)
 	}
 	defer probe.Close()
 
-	rd, err := ringbuf.NewReader(coll.Maps["events"])
+	rd, err := ringbuf.NewReader(coll.Maps["events"]) // new BPF ringbuf reader -> eBPFマップからリングバッファリーダーを作成します、ここではeventsマップからリーダーを作成しています
 	if err != nil {
 		log.Fatal("Failed to open ringbuf reader:", err)
 	}
@@ -91,9 +91,9 @@ func main() {
 		rd.Close() // シグナルを受け取ったらリングバッファリーダーを閉じて、ループを終了させる
 	}()
 	for {
-		record, err := rd.Read()
+		record, err := rd.Read() // リングバッファからイベントを読み取る
 		if err != nil {
-			if errors.Is(err, ringbuf.ErrClosed) {
+			if errors.Is(err, ringbuf.ErrClosed) { // リングバッファが閉じられた場合はループを終了します
 				break
 			}
 			log.Printf("Errro reading from ringbuf: %v", err)
